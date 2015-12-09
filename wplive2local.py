@@ -23,17 +23,21 @@ def main(argv):
     except IOError:
         print "NO SETTINGS FILE"
         sys.exit()    
-    print argv, argv[0]
+    
     try:
         site = argv[0]
         site_conf = sites[site]
         site_local = site_conf.local
         site_production = site_conf.production
+
+        wp_table_prefix = site_local.get('wp_table_prefix', None)
+        if wp_table_prefix is None:
+            wp_table_prefix = 'wp_'
+
     except KeyError:
         print "This is not a configured site"
         sys.exit()    
 
-    print local
     print "Begin Migration"
 
 
@@ -49,7 +53,7 @@ def main(argv):
 
 
     def _run_query(user, password, query, runtype='mysql', host='localhost', database=None):
-        print _build_query_command(user, password, query, runtype, host, database)
+        #print _build_query_command(user, password, query, runtype, host, database)
         os.popen(_build_query_command(user, password, query, runtype, host, database))
 
     def local_db_dump():
@@ -76,26 +80,26 @@ def main(argv):
         command = "ssh {}@{} '{} | gzip -9' | gzip -d | {}".format(
             site_production.ssh_user, site_production.ssh_address, production_query, 
                                                                         local_query)
-        
         os.popen(command)
 
 
     def local_update_urls():
         query = _build_query(local.db_user, local.db_password, local.mysql, 
                                                                 database=site_local.db)
-        query_command = """ "UPDATE wp_options \
+    
+        query_command = """ "UPDATE {2}options \
             SET option_value = replace(option_value, '{0}', '{1}')\
             WHERE option_name = 'home' OR option_name = 'siteurl';\
-            UPDATE wp_posts SET guid = replace(guid, '{0}', '{1}');\
-            UPDATE wp_posts SET post_content = replace(post_content, '{0}', '{1}');\
-            UPDATE wp_postmeta SET meta_value = replace(meta_value, '{0}', '{1}');";\
-        """.format(site_production.url, site_local.url)
+            UPDATE {2}posts SET guid = replace(guid, '{0}', '{1}');\
+            UPDATE {2}posts SET post_content = replace(post_content, '{0}', '{1}');\
+            UPDATE {2}postmeta SET meta_value = replace(meta_value, '{0}', '{1}');";\
+        """.format(site_production.url, site_local.url, wp_table_prefix) 
         os.popen("{} -Bse {}".format(query, query_command))    
 
 
     def local_set_password():
-        query = """UPDATE wp_users SET user_pass = MD5("{}") WHERE ID=1 LIMIT 1;
-                                                """.format(local.site_password, '{}')
+        query = """UPDATE {}users SET user_pass = MD5("{}") WHERE ID=1 LIMIT 1;
+                            """.format(wp_table_prefix, local.site_password, '{}')
         _run_query(local.db_user, local.db_password, query, local.mysql, 
                                                                 database=site_local.db)   
 
@@ -103,6 +107,7 @@ def main(argv):
         initial = True
 
     if not initial:
+        pass
         local_db_dump()
         local_db_drop()
 

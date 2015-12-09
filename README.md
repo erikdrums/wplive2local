@@ -7,7 +7,7 @@ You need to create a configuration file in your home directory named
 
 in the format:
 ```
-# Local settings
+# Local configuration
 local:
     mysql: 'mysql'
     mysqldump: 'mysqldump'
@@ -15,11 +15,12 @@ local:
     db_password: 'root'
     site_password: 'password'
 
-
+# Sites configurations
 sites:
     jyllandsakvariet:
         local:
             db: 'dbname'
+            wp_table_prefix: 'wp_' # Optional
             url: 'http://localhost/amazingsite.com'
             backup_path: '/tmp/amazingsite_backup'
         production:
