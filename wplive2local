@@ -22,7 +22,7 @@ def main(argv):
     try:
         configurations = yaml.load(open(CONFIG_PATH).read())
     except IOError:
-        print "NO SETTINGS FILE"
+        print "No settings file"
         sys.exit()    
         
     conf = Bunch.fromDict(configurations)
@@ -42,20 +42,18 @@ def main(argv):
         sys.exit()    
 
 
-    def _build_query(user, password, runtype='mysql', host='localhost', database=None):
+    def _build_query(user, password, runtype, host='localhost', database=None):
         
         if database is None:
             database = ''
         return "{} -u{} -p{} {} -h{}".format(runtype, user, password, database, host)
 
-    def _build_query_command(user, password, query_command, runtype='mysql', 
-                                                    host='localhost', database=None):
+    def _build_query_command(user, password, query_command, runtype, host, database=None):
         query = _build_query(user, password, runtype, host, database)
         return "{} -e '{}'".format(query, query_command)
 
 
-    def _run_query(user, password, query, runtype='mysql', host='localhost', database=None):
-        #print _build_query_command(user, password, query, runtype, host, database)
+    def _run_query(user, password, query, runtype, host='localhost', database=None):
         os.popen(_build_query_command(user, password, query, runtype, host, database))
 
     def local_db_dump():
@@ -78,11 +76,10 @@ def main(argv):
         production_query = _build_query(site_production.db_user, 
             production_db_pass, 'mysqldump', site_production.host, site_production.db)
         local_query = _build_query(local.db_user, local.db_password, 
-                                                    local.mysql, database=site_local.db)
+                                                local.mysql, database=site_local.db)
         command = "ssh {}@{} '{} {} | gzip -9' | gzip -d | {}".format(
-            site_production.ssh_user, site_production.ssh_address, 
+                            site_production.ssh_user, site_production.ssh_address, 
                                     production_query, lock_tables_arg, local_query)
-        print command
         os.popen(command)
 
 
@@ -90,12 +87,12 @@ def main(argv):
         query = _build_query(local.db_user, local.db_password, local.mysql, 
                                                                 database=site_local.db)
     
-        query_command = """ "UPDATE {2}options \
-            SET option_value = replace(option_value, '{0}', '{1}')\
-            WHERE option_name = 'home' OR option_name = 'siteurl';\
-            UPDATE {2}posts SET guid = replace(guid, '{0}', '{1}');\
-            UPDATE {2}posts SET post_content = replace(post_content, '{0}', '{1}');\
-            UPDATE {2}postmeta SET meta_value = replace(meta_value, '{0}', '{1}');";\
+        query_command = """ "UPDATE {2}options 
+            SET option_value = replace(option_value, '{0}', '{1}')
+            WHERE option_name = 'home' OR option_name = 'siteurl';
+            UPDATE {2}posts SET guid = replace(guid, '{0}', '{1}');
+            UPDATE {2}posts SET post_content = replace(post_content, '{0}', '{1}');
+            UPDATE {2}postmeta SET meta_value = replace(meta_value, '{0}', '{1}');";
         """.format(site_production.url, site_local.url, wp_table_prefix) 
         os.popen("{} -Bse {}".format(query, query_command))    
 

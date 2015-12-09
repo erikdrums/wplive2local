@@ -7,7 +7,7 @@ You need to create a configuration file in your home directory named
 
 in the format:
 ```
-# Local configuration
+## Local configuration
 local:
     mysql: 'mysql'
     mysqldump: 'mysqldump'
@@ -15,7 +15,7 @@ local:
     db_password: 'root'
     site_password: 'password'
 
-# Sites configurations
+## Sites configurations
 sites:
     jyllandsakvariet:
         local:
@@ -32,3 +32,7 @@ sites:
             url: 'http://amazingsite.com'
             db: 'dbname'
 ```
+
+## Two switches exist:
+* --init, no initial backup is made. Use the first time only.
+* --lock-tables-false, for avoiding mysql table lock when dumping database.
