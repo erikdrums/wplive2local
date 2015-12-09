@@ -6,7 +6,7 @@ You need to create a configuration file in your home directory named
 .wplive2local_conf
 
 in the format:
-
+```
 # Local settings
 local:
     mysql: 'mysql'
@@ -30,4 +30,4 @@ sites:
             host: 'localhost'
             url: 'http://amazingsite.com'
             db: 'dbname'
-
+```
