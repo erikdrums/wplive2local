@@ -1,20 +1,12 @@
 #!/usr/bin/python
 
-#http://spin.atomicobject.com/2011/08/08/remote-mysqldump-with-no-temp-files/
-
 import sys
-import string
-import shutil
-import getopt
 import os
 import os.path
 import syslog
 import errno
 import logging
-import tempfile
-import datetime
 import subprocess
-
 
 def main(argv):
 
