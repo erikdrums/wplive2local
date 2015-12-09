@@ -27,7 +27,7 @@ sites:
             ssh_user: 'root'
             ssh_address: 'http://amazingsite.com'
             db_user: 'root'
-            db_password: 'password'
+            db_password: 'password'# Optional
             host: 'localhost'
             url: 'http://amazingsite.com'
             db: 'dbname'

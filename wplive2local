@@ -17,12 +17,14 @@ def main(argv):
 
     try:
         configurations = yaml.load(open(CONFIG_PATH).read())
-        conf = Bunch.fromDict(configurations)
-        local = conf.local
-        sites = conf.sites
     except IOError:
         print "NO SETTINGS FILE"
         sys.exit()    
+        
+    conf = Bunch.fromDict(configurations)
+    local = conf.local
+    sites = conf.sites
+
     
     try:
         site = argv[0]
@@ -30,9 +32,9 @@ def main(argv):
         site_local = site_conf.local
         site_production = site_conf.production
 
-        wp_table_prefix = site_local.get('wp_table_prefix', None)
-        if wp_table_prefix is None:
-            wp_table_prefix = 'wp_'
+        wp_table_prefix = site_local.get('wp_table_prefix', 'wp_')
+        
+        production_db_pass = site_production.get('db_password', '')
 
     except KeyError:
         print "This is not a configured site"
@@ -42,6 +44,7 @@ def main(argv):
 
 
     def _build_query(user, password, runtype='mysql', host='localhost', database=None):
+        
         if database is None:
             database = ''
         return "{} -u{} -p{} {} -h{}".format(runtype, user, password, database, host)
@@ -58,7 +61,7 @@ def main(argv):
 
     def local_db_dump():
         dump_query = " --opt -c " + site_local.db + " > " + site_local.backup_path + ".sql"
-        query_command = "{} -e --opt -c {} > {}.sql".format(
+        query_command = "{} -e --opt -c --lock-tables=false {} > {}.sql".format(
                     _build_query(local.db_user, local.db_password, local.mysqldump), 
                                                 site_local.db, site_local.backup_path)
         os.popen(query_command)
@@ -74,12 +77,13 @@ def main(argv):
     
     def production_dump_to_local():
         production_query = _build_query(site_production.db_user, 
-            site_production.db_password, 'mysqldump', database=site_production.db)
+            production_db_pass, 'mysqldump', site_production.host, site_production.db)
         local_query = _build_query(local.db_user, local.db_password, 
                                                     local.mysql, database=site_local.db)
-        command = "ssh {}@{} '{} | gzip -9' | gzip -d | {}".format(
+        command = "ssh {}@{} '{} --lock-tables=false | gzip -9' | gzip -d | {}".format(
             site_production.ssh_user, site_production.ssh_address, production_query, 
                                                                         local_query)
+        print command
         os.popen(command)
 
 
