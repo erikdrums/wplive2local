@@ -26,7 +26,7 @@ local:
 
 # Sites configurations
 sites:
-    jyllandsakvariet:
+    amazingsite:
         local:
             db: 'dbname'
             wp_table_prefix: 'wp_' # Optional
@@ -40,6 +40,11 @@ sites:
             host: 'localhost'
             url: 'http://amazingsite.com'
             db: 'dbname'
+    other_amazingsite:
+        local:
+            ...
+        production
+            ...
 ```
 
 ## Two switches exist:
