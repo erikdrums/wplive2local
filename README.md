@@ -1,4 +1,13 @@
 # wplive2local
+This script was made to make wordpress migration easier, by automating the
+following steps:
+* create backup of current local database
+* reset local database by deleting and recreating it
+* do a mysqldump on production site and distibute it into local database
+* set wordpress siteurl and other absolute urls correctly according to local
+  url
+* set local admin password to configured password across all sites in
+  configuration to make login easier
 
 You need python package 'bunch' installed
 
@@ -7,7 +16,7 @@ You need to create a configuration file in your home directory named
 
 in the format:
 ```
-## Local configuration
+# Local configuration
 local:
     mysql: 'mysql'
     mysqldump: 'mysqldump'
@@ -15,7 +24,7 @@ local:
     db_password: 'root'
     site_password: 'password'
 
-## Sites configurations
+# Sites configurations
 sites:
     jyllandsakvariet:
         local:
