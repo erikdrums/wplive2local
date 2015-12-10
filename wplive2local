@@ -113,7 +113,7 @@ def main(argv):
     local_update_urls()
     local_set_password()
 
-    print "SUCCESS"
+    print "Success"
  
 if __name__ == "__main__":
   main(sys.argv[1:])
