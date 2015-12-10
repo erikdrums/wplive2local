@@ -9,7 +9,8 @@ following steps:
 * set local admin password to configured password across all sites in
   configuration to make login easier
 
-You need python package 'bunch' installed
+You need two python packages:
+sudo pip install PyYAML bunch
 
 You need to create a configuration file in your home directory named
 .wplive2local_conf
