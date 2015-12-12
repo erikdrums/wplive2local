@@ -1,12 +1,13 @@
 # wplive2local
 This script was made to make wordpress migration easier, by automating the
 following steps:
-1. create backup of current local database
-2. reset local database by deleting and recreating it
-3. do a mysqldump on production site and distibute it into local database
-4. set wordpress siteurl and other absolute urls correctly according to local
+
+1. Create backup of current local database
+2. Reset local database by deleting and recreating it
+3. Do a mysqldump on production site and distibute it into local database
+4. Set wordpress siteurl and other absolute urls correctly according to local
   url
-5. set local admin password to configured password across all sites in
+5. Set local admin password to configured password across all sites in
   configuration to make login easier
 
 You need two python packages:
